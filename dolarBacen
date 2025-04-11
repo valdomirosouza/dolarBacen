@@ -1,0 +1,21 @@
+function dolarBacen(dataCotacao) {
+  var partes = dataCotacao.split("-");
+  var dataFormatada = partes[1] + "-" + partes[0] + "-" + partes[2]; // formato MM-DD-AAAA
+  var url = "https://olinda.bcb.gov.br/olinda/servico/PTAX/versao/v1/odata/" +
+            "CotacaoDolarDia(dataCotacao=@dataCotacao)?" +
+            "@dataCotacao='" + dataFormatada + "'&$top=100&$format=json";
+
+  var response = UrlFetchApp.fetch(url);
+  var json = JSON.parse(response.getContentText());
+
+  if (json.value && json.value.length > 0) {
+    var cotacaoVenda = json.value[0].cotacaoVenda;
+    var cotacaoCompra = json.value[0].cotacaoCompra;
+    Logger.log("Cotação de Venda: " + cotacaoVenda);
+    Logger.log("Cotação de Compra: " + cotacaoCompra);
+    return cotacaoVenda; // ou cotacaoCompra, se preferir
+  } else {
+    Logger.log("Nenhuma cotação encontrada para a data.");
+    return "Sem dados";
+  }
+}
